@@ -1,4 +1,4 @@
-import mongoose, { Model } from 'mongoose';
+import mongoose, { HydratedDocument, Model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { IUserFields } from '../types';
@@ -19,6 +19,14 @@ const userSchema = new Schema<IUserFields, IUserModel, IUserMethods>({
     required: true,
     trim: true,
     unique: true,
+    validate:[{
+      validator:async function (this:HydratedDocument<IUserFields>, username:string):Promise<boolean>{
+        if(!this.isModified("username")) return true;
+        const user:HydratedDocument<IUserFields> | null = await User.findOne({username});
+        return !Boolean(user)
+      },
+      message:"This user is alrady registered"
+    }]
   },
   password: {
     type: String,
@@ -39,13 +47,14 @@ const userSchema = new Schema<IUserFields, IUserModel, IUserMethods>({
   role: {
     type: String,
     enum: ['admin', 'user'],
+    default:"user"
   },
   googleId: String,
   token: String,
 });
 
 userSchema.methods.checkPassword = async function (password: string) {
-  return await bcrypt.compare(this.password, password);
+  return await bcrypt.compare(password, this.password);
 };
 
 userSchema.methods.generateToken = function () {

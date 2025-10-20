@@ -42,6 +42,8 @@ usersRouter.post('/session', async (req, res, next) => {
     const user = await User.findOne({
       username: req.body.username,
     });
+
+  
     if (!user) {
       res.status(400).send({ error: 'No User Found' });
       return;
