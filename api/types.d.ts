@@ -6,4 +6,5 @@ export interface IUserFields {
   avatar: string;
   role: string;
   googleId: string;
+  token: string;
 }
