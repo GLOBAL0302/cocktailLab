@@ -1,27 +1,63 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { IUserFields } from '../../types';
+import type { IGlobalError, IUserFields, IValidationError } from '../../types';
+import { logInThunk, signInThunk } from './userThunk';
 
 type UserInitialState = {
   user: IUserFields | null;
   signInLoading: boolean;
-  signInError: boolean;
+  signInError: IValidationError | null;
   loginLoading: boolean;
-  loginError: boolean;
+  loginError: IGlobalError | null;
 };
 
 const initialState: UserInitialState = {
   user: null,
   signInLoading: false,
-  signInError: false,
+  signInError: null,
   loginLoading: false,
-  loginError: false,
+  loginError: null,
 };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
-  extraReducers: (buider) => {},
+  reducers: {
+    unSetUser: (state) => {
+      state.user = null;
+    },
+    unSetSignInError: (state) => {
+      state.signInError = null;
+    },
+    unSetLoginError: (state) => {
+      state.loginError = null;
+    },
+  },
+  extraReducers: (buider) => {
+    buider
+      .addCase(signInThunk.pending, (state) => {
+        state.signInLoading = true;
+      })
+      .addCase(signInThunk.fulfilled, (state, { payload }) => {
+        state.signInLoading = false;
+        state.user = payload;
+      })
+      .addCase(signInThunk.rejected, (state, { payload }) => {
+        state.signInLoading = false;
+        state.signInError = payload || null;
+      });
+
+    buider
+      .addCase(logInThunk.pending, (state) => {
+        state.loginLoading = true;
+      })
+      .addCase(logInThunk.fulfilled, (state, { payload }) => {
+        state.loginLoading = false;
+        state.user = payload;
+      })
+      .addCase(logInThunk.rejected, (state) => {
+        state.loginLoading = false;
+      });
+  },
   selectors: {
     selectUser: (state) => state.user,
     selectUserSignInLoading: (state) => state.signInLoading,
@@ -39,3 +75,4 @@ export const {
   selectUserSignInError,
   selectUserSignInLoading,
 } = userSlice.selectors;
+export const { unSetUser, unSetSignInError, unSetLoginError } = userSlice.actions;

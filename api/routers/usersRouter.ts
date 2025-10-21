@@ -43,7 +43,6 @@ usersRouter.post('/session', async (req, res, next) => {
       username: req.body.username,
     });
 
-  
     if (!user) {
       res.status(400).send({ error: 'No User Found' });
       return;

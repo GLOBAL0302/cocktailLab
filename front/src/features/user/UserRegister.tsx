@@ -11,6 +11,7 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { GoogleIcon } from '../../components/loginIcon';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import {
   Card,
   SignUpContainer,
@@ -22,10 +23,67 @@ import {
   socialButtonsContainer,
   linkTextStyles,
 } from './UserRegister.styles';
+import type { IUserRegisterMuation } from '../../types';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { signInThunk } from './userThunk';
+import { selectUserSignInError, selectUserSignInLoading, unSetSignInError } from './userSlice';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+const initialState: IUserRegisterMuation = {
+  username: '',
+  password: '',
+  displayName: '',
+  avatar: null,
+  mail: '',
+};
 
 const UserRegister = () => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [registerForm, setRegisterForm] = React.useState(initialState);
+  const dispatch = useAppDispatch();
+  const userSignInLoading = useAppSelector(selectUserSignInLoading);
+  const userSignInError = useAppSelector(selectUserSignInError);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const getError = (name: string) => {
+    try {
+      return userSignInError?.errors[name].message;
+    } catch (e) {
+      return;
+    }
+  };
+
+  React.useEffect(() => {
+    dispatch(unSetSignInError());
+  }, [location]);
+
+  const onChangeRegisterForm = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setRegisterForm((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    console.log(userSignInError?.errors);
+    try {
+      await dispatch(signInThunk(registerForm)).unwrap();
+      navigate('/');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const changeFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = event.target;
+    if (files) {
+      setRegisterForm((prevState) => ({
+        ...prevState,
+        avatar: files[0],
+      }));
+    }
   };
 
   return (
@@ -42,13 +100,24 @@ const UserRegister = () => {
           </HeaderContainer>
           <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
             <FormControl>
-              <FormLabel htmlFor="name">Username</FormLabel>
-              <TextField autoComplete="username" name="username" required fullWidth id="name" placeholder="Jon Snow" />
+              <FormLabel htmlFor="username">Username</FormLabel>
+              <TextField
+                onChange={onChangeRegisterForm}
+                value={registerForm.username}
+                autoComplete="username"
+                name="username"
+                fullWidth
+                id="name"
+                placeholder="Jon Snow"
+                helperText={getError('username')}
+                error={Boolean(getError('username'))}
+              />
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="password">Password</FormLabel>
               <TextField
-                required
+                onChange={onChangeRegisterForm}
+                value={registerForm.password}
                 fullWidth
                 name="password"
                 placeholder="••••••"
@@ -56,47 +125,53 @@ const UserRegister = () => {
                 id="password"
                 autoComplete="new-password"
                 variant="outlined"
+                helperText={getError('password')}
+                error={Boolean(getError('password'))}
               />
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="email">Display Name</FormLabel>
               <TextField
-                required
+                onChange={onChangeRegisterForm}
+                value={registerForm.displayName}
                 fullWidth
                 id="displayName"
                 placeholder="Jonnatan"
                 name="displayName"
                 autoComplete="email"
                 variant="outlined"
+                helperText={getError('displayName')}
+                error={Boolean(getError('displayName'))}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
+              <FormLabel htmlFor="email">Mail</FormLabel>
               <TextField
-                required
+                onChange={onChangeRegisterForm}
+                value={registerForm.mail}
                 fullWidth
-                id="email"
-                placeholder="your@email.com"
-                name="email"
-                autoComplete="email"
+                id="mail"
+                placeholder="your@mail.com"
+                name="mail"
+                autoComplete="mail"
                 variant="outlined"
+                helperText={getError('mail')}
+                error={Boolean(getError('mail'))}
               />
             </FormControl>
             <Button
+              color={registerForm.avatar ? 'success' : 'primary'}
               component="label"
               role={undefined}
               variant="contained"
               tabIndex={-1}
-              startIcon={<CloudUploadIcon />}
+              startIcon={registerForm.avatar ? <CloudDownloadIcon /> : <CloudUploadIcon />}
             >
-              Upload files
-              <VisuallyHiddenInput 
-                type="file" 
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => console.log(event.target.files)} 
-                multiple 
-              />
+              {registerForm.avatar ? registerForm.avatar.name.slice(1, 5) + '...' : 'Upload File'}
+
+              <VisuallyHiddenInput type="file" onChange={changeFile} multiple />
             </Button>
-            <Button type="submit" fullWidth variant="contained">
+            <Button loading={userSignInLoading} type="submit" fullWidth variant="contained">
               Sign up
             </Button>
           </Box>
@@ -115,7 +190,7 @@ const UserRegister = () => {
             <Typography sx={linkTextStyles}>
               Already have an account?{' '}
               <Link href="/login" variant="body2" sx={{ alignSelf: 'center' }}>
-               Login
+                Login
               </Link>
             </Typography>
           </Box>

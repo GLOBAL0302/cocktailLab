@@ -7,8 +7,8 @@ export const Card = styled(MuiCard)(({ theme }) => ({
   flexDirection: 'column',
   alignSelf: 'center',
   width: '100%',
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
+  padding: theme.spacing(2),
+  gap: theme.spacing(1),
   margin: 'auto',
   boxShadow: 'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
   [theme.breakpoints.up('sm')]: {
@@ -20,11 +20,11 @@ export const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 export const SignUpContainer = styled(Stack)(({ theme }) => ({
-  height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
+  height: 'calc((1 - var(--template-frame-height, 0)) * 95dvh)',
   minHeight: '100%',
   padding: theme.spacing(2),
   [theme.breakpoints.up('sm')]: {
-    padding: theme.spacing(4),
+    padding: theme.spacing(3),
   },
   '&::before': {
     content: '""',
@@ -68,13 +68,13 @@ export const iconStyles = {
 export const formStyles = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 2,
+  gap: 1,
 };
 
 export const socialButtonsContainer = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 2,
+  gap: 1,
 };
 
 export const linkTextStyles = {

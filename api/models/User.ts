@@ -19,14 +19,16 @@ const userSchema = new Schema<IUserFields, IUserModel, IUserMethods>({
     required: true,
     trim: true,
     unique: true,
-    validate:[{
-      validator:async function (this:HydratedDocument<IUserFields>, username:string):Promise<boolean>{
-        if(!this.isModified("username")) return true;
-        const user:HydratedDocument<IUserFields> | null = await User.findOne({username});
-        return !Boolean(user)
+    validate: [
+      {
+        validator: async function (this: HydratedDocument<IUserFields>, username: string): Promise<boolean> {
+          if (!this.isModified('username')) return true;
+          const user: HydratedDocument<IUserFields> | null = await User.findOne({ username });
+          return !Boolean(user);
+        },
+        message: 'This user is alrady registered',
       },
-      message:"This user is alrady registered"
-    }]
+    ],
   },
   password: {
     type: String,
@@ -47,7 +49,7 @@ const userSchema = new Schema<IUserFields, IUserModel, IUserMethods>({
   role: {
     type: String,
     enum: ['admin', 'user'],
-    default:"user"
+    default: 'user',
   },
   googleId: String,
   token: String,

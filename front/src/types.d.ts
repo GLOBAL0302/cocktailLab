@@ -5,11 +5,10 @@ export interface IUserFields {
   mail: string;
   avatar: string;
   role: string;
-  googleId: string;
   token: string;
 }
 
-export interface IUserSignInMuation {
+export interface IUserRegisterMuation {
   username: string;
   password: string;
   displayName: string;
@@ -17,7 +16,23 @@ export interface IUserSignInMuation {
   avatar: File | null;
 }
 
-export interface IUserLoginMuation {
+export interface IUserLoginMutation {
   username: string;
   password: string;
+}
+
+export interface IGlobalError {
+  error: string;
+}
+
+export interface IValidationError {
+  errors: {
+    [key: string]: {
+      message: string;
+      name: string;
+    };
+    message: string;
+    name: string;
+    _message: string;
+  };
 }
