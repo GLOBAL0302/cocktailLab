@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { IGlobalError, IUserFields, IValidationError } from '../../types';
-import { logInThunk, signInThunk } from './userThunk';
+import { googleLoginThunk, logInThunk, signInThunk } from './userThunk';
 
 type UserInitialState = {
   user: IUserFields | null;
@@ -54,8 +54,22 @@ const userSlice = createSlice({
         state.loginLoading = false;
         state.user = payload;
       })
-      .addCase(logInThunk.rejected, (state) => {
+      .addCase(logInThunk.rejected, (state, { payload }) => {
         state.loginLoading = false;
+        state.loginError = payload || null;
+      });
+
+    buider
+      .addCase(googleLoginThunk.pending, (state) => {
+        state.loginLoading = true;
+      })
+      .addCase(googleLoginThunk.fulfilled, (state, { payload }) => {
+        state.loginLoading = false;
+        state.user = payload;
+      })
+      .addCase(googleLoginThunk.rejected, (state, { payload }) => {
+        state.loginLoading = false;
+        state.loginError = payload || null;
       });
   },
   selectors: {

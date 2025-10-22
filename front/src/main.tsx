@@ -3,14 +3,21 @@ import './index.css';
 import App from './App.tsx';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { store } from './app/store.ts';
+import { persistor, store } from './app/store.ts';
 import { interceptor } from './axiosApi.ts';
+import { PersistGate } from 'redux-persist/integration/react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { googleClientId } from './Constants.ts';
 
 interceptor(store);
 createRoot(document.getElementById('root')!).render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </Provider>,
+  <GoogleOAuthProvider clientId={googleClientId}>
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </PersistGate>
+    </Provider>
+  </GoogleOAuthProvider>,
 );

@@ -5,8 +5,51 @@ import { upload } from '../middleware/multer';
 import { error } from 'console';
 import { auth, IReqWithUser } from '../middleware/auth';
 import { randomUUID } from 'crypto';
+import { OAuth2Client } from 'google-auth-library';
+import { config } from '../config';
 
 const usersRouter = express.Router();
+
+const googleClient = new OAuth2Client(config.google.clientId);
+
+usersRouter.post('/google', async (req, res, next) => {
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: req.body.credential,
+      audience: config.google.clientId,
+    });
+    const payload = ticket.getPayload();
+    if (!payload) {
+      return res.status(400).send({ error: 'Google Login error' });
+    }
+
+    const mail = payload.email;
+    const id = payload.sub;
+    const displayName = payload.name;
+    const avatar = payload.picture;
+
+    if (!mail) {
+      return res.status(400).send({ error: 'Google Login Error' });
+    }
+
+    let user = await User.findOne({ googleId: id });
+    if (!user) {
+      user = new User({
+        username: mail,
+        password: randomUUID(),
+        googleId: id,
+        displayName,
+        avatar,
+        mail,
+      });
+    }
+    user.generateToken();
+    await user.save();
+    res.status(200).send(user);
+  } catch (e) {
+    next(e);
+  }
+});
 
 usersRouter.post('/', upload.single('avatar'), async (req, res, next) => {
   try {

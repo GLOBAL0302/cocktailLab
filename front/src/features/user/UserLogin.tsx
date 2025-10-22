@@ -16,14 +16,16 @@ import TextField from '@mui/material/TextField';
 import FormLabel from '@mui/material/FormLabel';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import { GoogleIcon } from '../../components/loginIcon';
+import { GoogleLogin, GoogleOAuthProvider, type CredentialResponse } from '@react-oauth/google';
 import Link from '@mui/material/Link';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectUserLoginLoading } from './userSlice';
-import { logInThunk } from './userThunk';
+import { selectUserLoginError, selectUserLoginLoading } from './userSlice';
+import { googleLoginThunk, logInThunk } from './userThunk';
 import { useNavigate } from 'react-router-dom';
+import Alert from '@mui/material/Alert';
+import LinearProgress from '@mui/material/LinearProgress';
 const initialState = {
   username: '',
   password: '',
@@ -32,6 +34,8 @@ const initialState = {
 const UserLogin = () => {
   const [loginForm, setLoginForm] = useState(initialState);
   const loginLoading = useAppSelector(selectUserLoginLoading);
+  const loginError = useAppSelector(selectUserLoginError);
+  console.log(loginError);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -54,12 +58,25 @@ const UserLogin = () => {
     }));
   };
 
+  const googleLogin = async (credentialResponse: CredentialResponse) => {
+    if (credentialResponse.credential) {
+      try {
+        await dispatch(googleLoginThunk(credentialResponse.credential)).unwrap();
+        navigate('/');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
   return (
     <>
       <CssBaseline enableColorScheme />
+
       <Box sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <SignUpContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
+          {loginError && <Alert severity="error">{loginError.error}</Alert>}
           <HeaderContainer>
             <Typography component="h4" variant="h5" sx={titleStyles}>
               Login
@@ -73,7 +90,6 @@ const UserLogin = () => {
                 onChange={onChangeRegisterForm}
                 autoComplete="username"
                 name="username"
-                required
                 fullWidth
                 id="name"
                 placeholder="Jon Snow"
@@ -82,7 +98,6 @@ const UserLogin = () => {
             <FormControl>
               <FormLabel htmlFor="password">Password</FormLabel>
               <TextField
-                required
                 fullWidth
                 name="password"
                 placeholder="••••••"
@@ -102,14 +117,18 @@ const UserLogin = () => {
             <Typography sx={{ color: 'text.secondary' }}>or</Typography>
           </Divider>
           <Box sx={socialButtonsContainer}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert('Sign up with Google')}
-              startIcon={<GoogleIcon />}
-            >
-              Sign up with Google
-            </Button>
+            {loginLoading && <LinearProgress />}
+            <Box component="div" className="w-full flex justify-center">
+              <GoogleLogin
+                theme="filled_blue"
+                shape="pill"
+                onSuccess={googleLogin}
+                onError={() => {
+                  console.log('Login Failed');
+                }}
+              />
+            </Box>
+
             <Typography sx={linkTextStyles}>
               Already have an account?{' '}
               <Link href="/register" variant="body2" sx={{ alignSelf: 'center' }}>

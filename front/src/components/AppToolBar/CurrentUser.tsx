@@ -7,6 +7,8 @@ import type { IUserFields } from '../../types';
 import Avatar from '@mui/material/Avatar';
 import { apiUrl } from '../../Constants';
 import Typography from '@mui/material/Typography';
+import { useAppDispatch } from '../../app/hooks';
+import { logOutThunk } from '../../features/user/userThunk';
 
 type IProps = {
   user: IUserFields;
@@ -14,6 +16,7 @@ type IProps = {
 
 const CurrentUser: React.FC<IProps> = ({ user }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const dispatch = useAppDispatch();
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -23,7 +26,7 @@ const CurrentUser: React.FC<IProps> = ({ user }) => {
   };
   let image;
 
-  if (user.avatar) {
+  if (user.avatar && /^images/.test(user.avatar)) {
     image = apiUrl + '/' + user.avatar;
   }
 
@@ -36,7 +39,7 @@ const CurrentUser: React.FC<IProps> = ({ user }) => {
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
       >
-        <Avatar alt="Remy Sharp" src={image} className="mr-3" />{' '}
+        <Avatar alt="Remy Sharp" src={image ? image : user.avatar} className="mr-3" />{' '}
         <Typography component="p" variant="body1" color="white">
           {user.displayName}
         </Typography>
@@ -59,7 +62,7 @@ const CurrentUser: React.FC<IProps> = ({ user }) => {
       >
         <MenuItem onClick={handleClose}>Add Cocktail</MenuItem>
         <MenuItem onClick={handleClose}>My Cocktails</MenuItem>
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
+        <MenuItem onClick={() => dispatch(logOutThunk())}>Logout</MenuItem>
       </Menu>
     </div>
   );

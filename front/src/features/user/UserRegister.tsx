@@ -10,7 +10,6 @@ import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { GoogleIcon } from '../../components/loginIcon';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import {
   Card,
@@ -25,9 +24,11 @@ import {
 } from './UserRegister.styles';
 import type { IUserRegisterMuation } from '../../types';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { signInThunk } from './userThunk';
-import { selectUserSignInError, selectUserSignInLoading, unSetSignInError } from './userSlice';
+import { googleLoginThunk, signInThunk } from './userThunk';
+import { selectUserLoginLoading, selectUserSignInError, selectUserSignInLoading, unSetSignInError } from './userSlice';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
+import LinearProgress from '@mui/material/LinearProgress';
 
 const initialState: IUserRegisterMuation = {
   username: '',
@@ -42,6 +43,7 @@ const UserRegister = () => {
   const dispatch = useAppDispatch();
   const userSignInLoading = useAppSelector(selectUserSignInLoading);
   const userSignInError = useAppSelector(selectUserSignInError);
+  const userLoginLoading = useAppSelector(selectUserLoginLoading);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -83,6 +85,17 @@ const UserRegister = () => {
         ...prevState,
         avatar: files[0],
       }));
+    }
+  };
+
+  const googleLogin = async (credentialResponse: CredentialResponse) => {
+    if (credentialResponse.credential) {
+      try {
+        await dispatch(googleLoginThunk(credentialResponse.credential)).unwrap();
+        navigate('/');
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -179,14 +192,17 @@ const UserRegister = () => {
             <Typography sx={{ color: 'text.secondary' }}>or</Typography>
           </Divider>
           <Box sx={socialButtonsContainer}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert('Sign up with Google')}
-              startIcon={<GoogleIcon />}
-            >
-              Sign up with Google
-            </Button>
+            {userLoginLoading && <LinearProgress />}
+            <Box component="div" className={`w-full flex justify-center ${userLoginLoading && 'hidden'}`}>
+              <GoogleLogin
+                theme="filled_blue"
+                shape="pill"
+                onSuccess={googleLogin}
+                onError={() => {
+                  console.log('Login Failed');
+                }}
+              />
+            </Box>
             <Typography sx={linkTextStyles}>
               Already have an account?{' '}
               <Link href="/login" variant="body2" sx={{ alignSelf: 'center' }}>
