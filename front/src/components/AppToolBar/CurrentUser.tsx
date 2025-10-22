@@ -9,6 +9,7 @@ import { apiUrl } from '../../Constants';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch } from '../../app/hooks';
 import { logOutThunk } from '../../features/user/userThunk';
+import { Link } from 'react-router-dom';
 
 type IProps = {
   user: IUserFields;
@@ -60,8 +61,10 @@ const CurrentUser: React.FC<IProps> = ({ user }) => {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={handleClose}>Add Cocktail</MenuItem>
         <MenuItem onClick={handleClose}>My Cocktails</MenuItem>
+        <MenuItem onClick={handleClose}>
+          <Link to="/addCocktail">Add Cocktail</Link>
+        </MenuItem>
         <MenuItem onClick={() => dispatch(logOutThunk())}>Logout</MenuItem>
       </Menu>
     </div>

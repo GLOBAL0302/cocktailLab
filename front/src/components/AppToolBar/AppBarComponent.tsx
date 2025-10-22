@@ -7,6 +7,7 @@ import { useAppSelector } from '../../app/hooks';
 import { selectUser } from '../../features/user/userSlice';
 import CurrentUser from './CurrentUser';
 import Incognito from './Incognito';
+import { Link } from 'react-router-dom';
 
 const AppBarComponent = () => {
   const user = useAppSelector(selectUser);
@@ -14,12 +15,14 @@ const AppBarComponent = () => {
     <div>
       <AppBar position="static">
         <Toolbar variant="dense" className="flex justify-around bg-black">
-          <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-            <LiaCocktailSolid />
-            <Typography component="p" variant="body1">
-              Cocktail
-            </Typography>
-          </IconButton>
+          <Link to="/">
+            <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
+              <LiaCocktailSolid />
+              <Typography component="p" variant="body1">
+                Cocktail
+              </Typography>
+            </IconButton>
+          </Link>
           {user ? <CurrentUser user={user} /> : <Incognito />}
         </Toolbar>
       </AppBar>

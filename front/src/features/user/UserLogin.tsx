@@ -35,10 +35,8 @@ const UserLogin = () => {
   const [loginForm, setLoginForm] = useState(initialState);
   const loginLoading = useAppSelector(selectUserLoginLoading);
   const loginError = useAppSelector(selectUserLoginError);
-  console.log(loginError);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 

@@ -21,6 +21,25 @@ export interface IUserLoginMutation {
   password: string;
 }
 
+export interface ICocktail {
+  _id: string;
+  user: IUserFields;
+  title: string;
+  image: string;
+  receipt: string;
+  isPublished: string;
+  ingredients: { title: string; amoiunt: string }[];
+  ratings: { rating: number; user: IUserFields }[];
+}
+
+export interface ICocktailMutation {
+  title: string;
+  image: File | null;
+  receipt: string;
+  isPublished: string;
+  ingredients: { title: string; amount: string }[];
+}
+
 export interface IGlobalError {
   error: string;
 }
