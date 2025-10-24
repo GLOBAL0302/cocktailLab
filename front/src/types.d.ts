@@ -33,7 +33,6 @@ export interface ICocktail {
 }
 
 interface ICocktailIngredient {
-  _id: string;
   title: string;
   amount: string;
 }

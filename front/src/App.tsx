@@ -15,7 +15,6 @@ function App() {
           <Route path="/" element={<Cocktails />} />
           <Route path="/register" element={<UserRegister />} />
           <Route path="/login" element={<UserLogin />} />
-
           <Route path="/addCocktail" element={<AddCocktail />} />
           <Route path="*" element={<h1>No Page</h1>} />
         </Routes>
