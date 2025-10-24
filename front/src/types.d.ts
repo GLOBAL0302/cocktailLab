@@ -32,12 +32,17 @@ export interface ICocktail {
   ratings: { rating: number; user: IUserFields }[];
 }
 
+interface ICocktailIngredient {
+  _id: string;
+  title: string;
+  amount: string;
+}
+
 export interface ICocktailMutation {
   title: string;
   image: File | null;
   receipt: string;
-  isPublished: string;
-  ingredients: { title: string; amount: string }[];
+  ingredients: ICocktailIngredient[];
 }
 
 export interface IGlobalError {

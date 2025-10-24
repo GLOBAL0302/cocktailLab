@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ICocktailMutation } from '../../types';
+import type { ICocktailIngredient, ICocktailMutation } from '../../types';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import {
@@ -26,8 +26,7 @@ const initialState = {
   title: '',
   image: null,
   receipt: '',
-  isPublished: '',
-  ingredients: [{ title: '', amount: '' }],
+  ingredients: [{ _id: crypto.randomUUID(), title: '', amount: '' }],
 };
 
 const AddCocktail = () => {
@@ -46,16 +45,32 @@ const AddCocktail = () => {
   //   }, [location]);
 
   const onChangeRegisterForm = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setAddCocktailForm((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    const { name, value, id } = e.target;
+    switch (name === id) {
+      case true:
+        setAddCocktailForm((prevState) => ({
+          ...prevState,
+          [name]: value,
+        }));
+        break;
+      case false:
+        setAddCocktailForm((prevState) => {
+          const certainIngredient = prevState.ingredients.filter((item) => id == item._id)[0];
+          const addedCertainIngredient = { ...certainIngredient, [name]: value };
+          const updatedIngredients = prevState.ingredients.filter((item) => item._id !== id);
+          return {
+            ...prevState,
+            ingredients: [...updatedIngredients, addedCertainIngredient],
+          };
+        });
+        break;
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    console.log(addCocktailForm);
     try {
       //   await dispatch(signInThunk(registerForm)).unwrap();
       //   navigate('/');
@@ -69,7 +84,7 @@ const AddCocktail = () => {
     if (files) {
       setAddCocktailForm((prevState) => ({
         ...prevState,
-        avatar: files[0],
+        image: files[0],
       }));
     }
   };
@@ -77,13 +92,13 @@ const AddCocktail = () => {
   const addMoreIngredients = () => {
     setAddCocktailForm((prevState) => {
       const ingredients = prevState.ingredients;
+      const _id = crypto.randomUUID();
       return {
         ...prevState,
-        ingredients: [...ingredients, { title: '', amount: '' }],
+        ingredients: [...ingredients, { _id, title: '', amount: '' }],
       };
     });
   };
-  console.log(addCocktailForm.ingredients);
   return (
     <>
       <CssBaseline enableColorScheme />
@@ -119,7 +134,7 @@ const AddCocktail = () => {
                 name="receipt"
                 fullWidth
                 id="receipt"
-                placeholder="detail procedure of making current cocktail"
+                placeholder="Detail procedure of making current cocktail"
               />
             </FormControl>
             <Divider sx={{ border: '1px dashed grey' }} />
@@ -130,18 +145,18 @@ const AddCocktail = () => {
               </Typography>
 
               <Box component="div" className="overflow-scroll max-h-40">
-                {addCocktailForm.ingredients.map((ingredient, index) => (
-                  <Box component="div" className="flex items-center gap-2">
+                {Object.values(addCocktailForm.ingredients).map((ingredient, index) => (
+                  <Box key={ingredient._id} component="div" className="flex items-center gap-2 border-b-2 py-1">
                     <Typography className="w-5 h-5 rounded-2xl bg-black text-center text-white">{index + 1}</Typography>
                     <FormControl>
                       <FormLabel htmlFor="title">Title</FormLabel>
                       <TextField
                         onChange={onChangeRegisterForm}
-                        value={addCocktailForm.receipt}
+                        value={ingredient.title}
                         autoComplete="title"
-                        name={`title${index}`}
+                        name="title"
                         fullWidth
-                        id={`title${index}`}
+                        id={ingredient._id}
                         placeholder="Ingredient cocktail"
                       />
                     </FormControl>
@@ -149,11 +164,11 @@ const AddCocktail = () => {
                       <FormLabel htmlFor="amount">Amount</FormLabel>
                       <TextField
                         onChange={onChangeRegisterForm}
-                        value={addCocktailForm.receipt}
+                        value={ingredient.amount}
                         autoComplete="amount"
-                        name={`amount${index}`}
+                        name="amount"
                         fullWidth
-                        id={`amount${index}`}
+                        id={ingredient._id}
                         placeholder="Ingredient amount"
                       />
                     </FormControl>

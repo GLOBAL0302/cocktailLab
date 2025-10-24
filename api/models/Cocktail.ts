@@ -3,7 +3,7 @@ import { title } from 'process';
 
 const Schema = mongoose.Schema;
 
-//Need to added User Validation Here
+//Need to add User Validation Here
 
 const cocktailSchema = new Schema({
   user: {
@@ -27,7 +27,7 @@ const cocktailSchema = new Schema({
     require: true,
   },
   ingredients: {
-    type: [{ title: String, amount: String }],
+    type: [{ _id:String,title: String, amount: String }],
     required: true,
   },
   ratings: {
