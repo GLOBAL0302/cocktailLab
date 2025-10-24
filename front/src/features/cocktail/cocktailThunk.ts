@@ -29,3 +29,8 @@ export const submitCocktailsThunk = createAsyncThunk<void, ICocktailMutation, { 
     }
   },
 );
+
+export const fetchCocktailsThunk = createAsyncThunk('cocktails/fetchCocktailsThunk', async () => {
+  const { data } = await axiosApi.get('/cocktails');
+  return data;
+});

@@ -23,11 +23,16 @@ import { MdAddCircle } from 'react-icons/md';
 import Divider from '@mui/material/Divider';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { submitCocktailsThunk } from './cocktailThunk';
-import { selectCocktailsSubmitting, selectCocktailsSubmittingError } from './cocktailSlice';
+import {
+  selectCocktailsSubmitting,
+  selectCocktailsSubmittingError,
+  unSetCoktailSubmittingError,
+} from './cocktailSlice';
 import FormHelperText from '@mui/material/FormHelperText';
 import { notifyError, notifySuccess } from '../../utils/ToastifyFuncs/toastConfig';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import IconButton from '@mui/material/IconButton';
+import { useNavigate } from 'react-router-dom';
 
 const initialState = {
   title: '',
@@ -41,6 +46,7 @@ const AddCocktail = () => {
   const cocktailSubmittingError = useAppSelector(selectCocktailsSubmittingError);
   const cocktailSubmitting = useAppSelector(selectCocktailsSubmitting);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const getError = (name: string) => {
     try {
@@ -81,10 +87,12 @@ const AddCocktail = () => {
     event.preventDefault();
     try {
       await dispatch(submitCocktailsThunk(addCocktailForm)).unwrap();
-      notifySuccess('CocktailSuccessfully Added');
-      //   navigate('/');
+      dispatch(unSetCoktailSubmittingError());
+      notifySuccess('Cocktail is under review');
+      setAddCocktailForm(initialState);
+      navigate('/');
     } catch (e) {
-      notifyError('Error in filling CocktailForm');
+      notifyError('Error in filling Cocktail Form');
       console.error(e);
     }
   };
@@ -180,6 +188,7 @@ const AddCocktail = () => {
                           name="title"
                           fullWidth
                           placeholder="Ingredient cocktail"
+                          required
                         />
                       </FormControl>
                       <FormControl>
@@ -191,6 +200,7 @@ const AddCocktail = () => {
                           name="amount"
                           fullWidth
                           placeholder="Ingredient amount"
+                          required
                         />
                       </FormControl>
                       <IconButton

@@ -8,6 +8,8 @@ const cocktailsRouter = express.Router();
 
 cocktailsRouter.get('/', async (req, res, next) => {
   try {
+    const cocktails = await Cocktail.find();
+    res.status(200).send(cocktails);
   } catch (e) {
     next(e);
   }

@@ -8,3 +8,17 @@ export interface IUserFields {
   googleId: string;
   token: string;
 }
+
+interface IIngredient {
+  title: string;
+  amount: string;
+}
+
+export interface ICocktailFields {
+  user: IUserFields;
+  title: string;
+  receipt: string;
+  ingredients: IIngredient[];
+  password: string;
+  image: string;
+}

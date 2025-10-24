@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { ICocktail, IValidationError } from '../../types';
-import { submitCocktailsThunk } from './cocktailThunk';
+import { fetchCocktailsThunk, submitCocktailsThunk } from './cocktailThunk';
 
 interface ICocktailSliceInitialState {
   cocktails: ICocktail[];
@@ -36,6 +36,18 @@ const cocktailsSlice = createSlice({
         state.cocktailsSubmitting = false;
         state.cocktailsSubmittingError = payload || null;
       });
+
+    builder
+      .addCase(fetchCocktailsThunk.pending, (state) => {
+        state.cocktailsLoading = true;
+      })
+      .addCase(fetchCocktailsThunk.fulfilled, (state, { payload }) => {
+        state.cocktailsLoading = false;
+        state.cocktails = payload;
+      })
+      .addCase(fetchCocktailsThunk.rejected, (state) => {
+        state.cocktailsLoading = false;
+      });
   },
   selectors: {
     selectCocktails: (state) => state.cocktails,
@@ -46,5 +58,6 @@ const cocktailsSlice = createSlice({
 });
 
 export const cocktailsReducer = cocktailsSlice.reducer;
+export const { unSetCoktailSubmittingError } = cocktailsSlice.actions;
 export const { selectCocktails, selectCocktailsLoading, selectCocktailsSubmitting, selectCocktailsSubmittingError } =
   cocktailsSlice.selectors;

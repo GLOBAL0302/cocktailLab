@@ -28,7 +28,7 @@ export interface ICocktail {
   image: string;
   receipt: string;
   isPublished: string;
-  ingredients: { title: string; amoiunt: string }[];
+  ingredients: { _id: string; title: string; amount: string }[];
   ratings: { rating: number; user: IUserFields }[];
 }
 

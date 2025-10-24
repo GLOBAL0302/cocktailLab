@@ -1,20 +1,39 @@
-import mongoose from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { title } from 'process';
+import { User } from './User';
+import { ICocktailFields } from '../types';
 
 const Schema = mongoose.Schema;
-
-//Need to add User Validation Here
 
 const cocktailSchema = new Schema({
   user: {
     type: mongoose.Types.ObjectId,
     ref: 'user',
     required: [true],
+    validate: [
+      {
+        validator: async (value: mongoose.Types.ObjectId) => {
+          const user = await User.findById(value);
+          return Boolean(user);
+        },
+        message: 'User Id is required for Cocktail',
+      },
+    ],
   },
   title: {
     required: [true, 'Please add title to cocktail'],
     type: String,
     trim: true,
+    validate: [
+      {
+        validator: async function (this: HydratedDocument<ICocktailFields>, title: string): Promise<boolean> {
+          if (!this.isModified('title')) return true;
+          const cocktailTitle: HydratedDocument<ICocktailFields> | null = await Cocktail.findOne({ title });
+          return !Boolean(cocktailTitle);
+        },
+        message: 'This Cocktail title is already exist',
+      },
+    ],
   },
   image: {
     required: [true, 'Cocktail required image'],

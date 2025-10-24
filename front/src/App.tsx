@@ -5,8 +5,12 @@ import UserRegister from './features/user/UserRegister';
 import Cocktails from './features/cocktail/Cocktails';
 import AppBarComponent from './components/AppToolBar/AppBarComponent';
 import AddCocktail from './features/cocktail/AddCocktail';
+import ProtectedRouter from './components/ProtectedRouter/ProtectedRouter';
+import { useAppSelector } from './app/hooks';
+import { selectUser } from './features/user/userSlice';
 
 function App() {
+  const user = useAppSelector(selectUser);
   return (
     <div className="overflow-hidden h-screen w-screen">
       <AppBarComponent />
@@ -15,7 +19,14 @@ function App() {
           <Route path="/" element={<Cocktails />} />
           <Route path="/register" element={<UserRegister />} />
           <Route path="/login" element={<UserLogin />} />
-          <Route path="/addCocktail" element={<AddCocktail />} />
+          <Route
+            path="/addCocktail"
+            element={
+              <ProtectedRouter isAllow={user !== null}>
+                <AddCocktail />
+              </ProtectedRouter>
+            }
+          />
           <Route path="*" element={<h1>No Page</h1>} />
         </Routes>
       </div>
