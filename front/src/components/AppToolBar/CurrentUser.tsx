@@ -27,7 +27,7 @@ const CurrentUser: React.FC<IProps> = ({ user }) => {
   };
   let image;
 
-  if (user.avatar && /^images/.test(user.avatar)) {
+  if (user.avatar && (/^images/.test(user.avatar) || /^fixtures/.test(user.avatar))) {
     image = apiUrl + '/' + user.avatar;
   }
 

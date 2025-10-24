@@ -28,6 +28,8 @@ const Cocktail: React.FC<Props> = ({ cocktail }) => {
   const [modal, setModal] = useState<boolean>(false);
   const [value, setValue] = useState<number | null>(0);
   let image;
+  const ratingSum = cocktail.ratings.reduce((sum, item)=>sum + item.rating, 0) / cocktail.ratings.length
+
 
   if (cocktail.image) {
     image = apiUrl + '/' + cocktail.image;
@@ -48,7 +50,7 @@ const Cocktail: React.FC<Props> = ({ cocktail }) => {
         <Typography gutterBottom variant="h5" component="div">
           {cocktail.title}
         </Typography>
-        <Rating name="no-value" value={null} />
+        <Rating name="no-value" value={ratingSum} precision={0.5}/>
       </CardContent>
       <Modal
         open={modal}
@@ -67,7 +69,7 @@ const Cocktail: React.FC<Props> = ({ cocktail }) => {
               <p className="font-extrabold uppercase">ingredients:</p>
               <ul className="list-disc">
                 {cocktail.ingredients.map((ingredient) => (
-                  <li id={ingredient._id}>
+                  <li key={ingredient._id}>
                     <span>{ingredient.title}</span> <span>{ingredient.amount}</span>
                   </li>
                 ))}
@@ -77,7 +79,7 @@ const Cocktail: React.FC<Props> = ({ cocktail }) => {
               <Rating
                 name="simple-controlled"
                 value={value}
-                onChange={(event, newValue) => {
+                onChange={(_event, newValue) => {
                   setValue(newValue);
                 }}
               />

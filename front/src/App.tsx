@@ -27,7 +27,7 @@ function App() {
               </ProtectedRouter>
             }
           />
-          <Route path="*" element={<h1>No Page</h1>} />
+          <Route path="*" element={<h1>No Page such</h1>} />
         </Routes>
       </div>
     </div>
