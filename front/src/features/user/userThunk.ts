@@ -19,7 +19,7 @@ export const signInThunk = createAsyncThunk<IUserFields, IUserRegisterMuation, {
       const keys = Object.keys(registerForm) as (keyof IUserRegisterMuation)[];
       keys.forEach((key) => {
         const value = registerForm[key];
-        if (value) {
+        if (value !== null) {
           dataForm.append(key, value);
         }
       });

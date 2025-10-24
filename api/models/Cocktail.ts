@@ -8,26 +8,29 @@ const Schema = mongoose.Schema;
 const cocktailSchema = new Schema({
   user: {
     type: mongoose.Types.ObjectId,
-    require: true,
+    ref: 'user',
+    required: [true],
   },
   title: {
-    require: true,
+    required: [true, 'Please add title to cocktail'],
     type: String,
+    trim: true,
   },
   image: {
-    require: true,
+    required: [true, 'Cocktail required image'],
     type: String,
   },
   receipt: {
     type: String,
-    require: true,
+    trim: true,
+    required: [true, 'Cocktail required receipt'],
   },
   isPublished: {
     type: Boolean,
-    require: true,
+    default: false,
   },
   ingredients: {
-    type: [{ _id:String,title: String, amount: String }],
+    type: [{ title: String, amount: String }],
     required: true,
   },
   ratings: {
@@ -35,7 +38,8 @@ const cocktailSchema = new Schema({
       {
         user: {
           type: mongoose.Types.ObjectId,
-          require: true,
+          ref: 'user',
+          required: true,
         },
         rating: {
           type: Number,

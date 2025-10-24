@@ -8,6 +8,7 @@ import { interceptor } from './axiosApi.ts';
 import { PersistGate } from 'redux-persist/integration/react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { googleClientId } from './Constants.ts';
+import { ToastContainer } from 'react-toastify';
 
 interceptor(store);
 createRoot(document.getElementById('root')!).render(
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')!).render(
       <PersistGate persistor={persistor}>
         <BrowserRouter>
           <App />
+          <ToastContainer />
         </BrowserRouter>
       </PersistGate>
     </Provider>

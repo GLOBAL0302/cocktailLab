@@ -21,6 +21,13 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { MdAddCircle } from 'react-icons/md';
 import Divider from '@mui/material/Divider';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { submitCocktailsThunk } from './cocktailThunk';
+import { selectCocktailsSubmitting, selectCocktailsSubmittingError } from './cocktailSlice';
+import FormHelperText from '@mui/material/FormHelperText';
+import { notifyError, notifySuccess } from '../../utils/ToastifyFuncs/toastConfig';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import IconButton from '@mui/material/IconButton';
 
 const initialState = {
   title: '',
@@ -31,9 +38,17 @@ const initialState = {
 
 const AddCocktail = () => {
   const [addCocktailForm, setAddCocktailForm] = useState<ICocktailMutation>(initialState);
-  //   React.useEffect(() => {
-  //     dispatch(unSetSignInError());
-  //   }, [location]);
+  const cocktailSubmittingError = useAppSelector(selectCocktailsSubmittingError);
+  const cocktailSubmitting = useAppSelector(selectCocktailsSubmitting);
+  const dispatch = useAppDispatch();
+
+  const getError = (name: string) => {
+    try {
+      return cocktailSubmittingError?.errors[name].message;
+    } catch (e) {
+      return;
+    }
+  };
 
   const onChangeAddCocktailForm = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -64,16 +79,15 @@ const AddCocktail = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    console.log(addCocktailForm);
     try {
-      //   await dispatch(signInThunk(registerForm)).unwrap();
+      await dispatch(submitCocktailsThunk(addCocktailForm)).unwrap();
+      notifySuccess('CocktailSuccessfully Added');
       //   navigate('/');
     } catch (e) {
+      notifyError('Error in filling CocktailForm');
       console.error(e);
     }
   };
-
   const changeFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
     if (files) {
@@ -92,6 +106,15 @@ const AddCocktail = () => {
         ingredients: [...ingredients, { title: '', amount: '' }],
       };
     });
+  };
+
+  const removeIngredientForm = (index: number) => {
+    const newIngredientsList = addCocktailForm.ingredients;
+    newIngredientsList.splice(index, 1);
+    setAddCocktailForm((prevState) => ({
+      ...prevState,
+      ingredients: [...newIngredientsList],
+    }));
   };
   return (
     <>
@@ -115,8 +138,8 @@ const AddCocktail = () => {
                 fullWidth
                 id="title"
                 placeholder="Mochito"
-                // helperText={getError('username')}
-                // error={Boolean(getError('username'))}
+                helperText={getError('title')}
+                error={Boolean(getError('title'))}
               />
             </FormControl>
             <FormControl>
@@ -129,6 +152,8 @@ const AddCocktail = () => {
                 fullWidth
                 id="receipt"
                 placeholder="Detail procedure of making current cocktail"
+                helperText={getError('receipt')}
+                error={Boolean(getError('receipt'))}
               />
             </FormControl>
             <Divider sx={{ border: '1px dashed grey' }} />
@@ -168,6 +193,14 @@ const AddCocktail = () => {
                           placeholder="Ingredient amount"
                         />
                       </FormControl>
+                      <IconButton
+                        onClick={() => removeIngredientForm(index)}
+                        color="error"
+                        aria-label="delete"
+                        size="large"
+                      >
+                        <DeleteForeverIcon fontSize="inherit" />
+                      </IconButton>
                     </Box>
                   );
                 })}
@@ -176,19 +209,22 @@ const AddCocktail = () => {
               <Button color="primary" onClick={addMoreIngredients} startIcon={<MdAddCircle style={iconStyles} />} />
             </Box>
 
-            <Button
-              color={addCocktailForm.image ? 'success' : 'primary'}
-              component="label"
-              role={undefined}
-              variant="contained"
-              tabIndex={-1}
-              startIcon={addCocktailForm.image ? <CloudDownloadIcon /> : <CloudUploadIcon />}
-            >
-              {addCocktailForm.image ? addCocktailForm.image.name.slice(1, 5) + '...' : 'Upload File'}
-
-              <VisuallyHiddenInput type="file" onChange={changeFile} multiple />
-            </Button>
-            <Button type="submit" fullWidth variant="contained">
+            <Box component="div" className="flex flex-col items-center">
+              <Button
+                className="w-96"
+                color={addCocktailForm.image ? 'success' : 'primary'}
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}
+                startIcon={addCocktailForm.image ? <CloudDownloadIcon /> : <CloudUploadIcon />}
+              >
+                {addCocktailForm.image ? addCocktailForm.image.name.slice(0, 5) + '...' : 'Upload File'}
+                <VisuallyHiddenInput type="file" onChange={changeFile} multiple />
+              </Button>
+              <FormHelperText error={Boolean(getError('image'))}>{getError('image')}</FormHelperText>
+            </Box>
+            <Button loading={cocktailSubmitting} type="submit" fullWidth variant="contained">
               Add Cocktail
             </Button>
           </Box>
