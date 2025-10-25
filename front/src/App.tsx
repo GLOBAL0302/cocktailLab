@@ -20,6 +20,14 @@ function App() {
           <Route path="/register" element={<UserRegister />} />
           <Route path="/login" element={<UserLogin />} />
           <Route
+            path="/myCocktails"
+            element={
+              <ProtectedRouter isAllow={user !== null}>
+                <Cocktails />
+              </ProtectedRouter>
+            }
+          />
+          <Route
             path="/addCocktail"
             element={
               <ProtectedRouter isAllow={user !== null}>

@@ -61,7 +61,9 @@ const CurrentUser: React.FC<IProps> = ({ user }) => {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={handleClose}>My Cocktails</MenuItem>
+        <MenuItem onClick={handleClose}>
+          <Link to="/myCocktails">My Cocktails</Link>
+        </MenuItem>
         <MenuItem onClick={handleClose}>
           <Link to="/addCocktail">Add Cocktail</Link>
         </MenuItem>

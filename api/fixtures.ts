@@ -59,7 +59,10 @@ const run = async () => {
         { title: 'Lemon', amount: '1' },
         { title: 'passion fruit', amount: '1' },
       ],
-      ratings: [{ user: user2, rating: 3 }, { user: user, rating: 1}],
+      ratings: [
+        { user: user2, rating: 3 },
+        { user: user, rating: 1 },
+      ],
     },
 
     {
@@ -75,7 +78,10 @@ const run = async () => {
         { title: 'Lemon', amount: '1' },
         { title: 'passion fruit', amount: '1' },
       ],
-      ratings: [{ user: user2, rating: 4 }, { user: user, rating: 3 }],
+      ratings: [
+        { user: user2, rating: 4 },
+        { user: user, rating: 3 },
+      ],
     },
 
     {
@@ -91,7 +97,10 @@ const run = async () => {
         { title: 'Lemon', amount: '1' },
         { title: 'passion fruit', amount: '1' },
       ],
-      ratings: [{ user: user, rating: 2 }, { user: user2, rating: 3 }],
+      ratings: [
+        { user: user, rating: 2 },
+        { user: user2, rating: 3 },
+      ],
     },
 
     {
@@ -107,7 +116,10 @@ const run = async () => {
         { title: 'Lemon', amount: '1' },
         { title: 'passion fruit', amount: '1' },
       ],
-      ratings: [{ user: user, rating: 5 },{ user: user2, rating: 4 }],
+      ratings: [
+        { user: user, rating: 5 },
+        { user: user2, rating: 4 },
+      ],
     },
   );
   await db.close();

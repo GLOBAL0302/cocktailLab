@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import type { ICocktailMutation, IValidationError } from '../../types';
+import type { ICocktail, ICocktailMutation, IValidationError } from '../../types';
 import { axiosApi } from '../../axiosApi';
 import { isAxiosError } from 'axios';
 
@@ -30,7 +30,17 @@ export const submitCocktailsThunk = createAsyncThunk<void, ICocktailMutation, { 
   },
 );
 
-export const fetchCocktailsThunk = createAsyncThunk('cocktails/fetchCocktailsThunk', async () => {
-  const { data } = await axiosApi.get('/cocktails');
-  return data;
-});
+export const fetchCocktailsThunk = createAsyncThunk<ICocktail[], string>(
+  'cocktails/fetchCocktailsThunk',
+  async (param) => {
+    const { data } = await axiosApi.get(`/cocktails?filter=${param}`);
+    return data;
+  },
+);
+
+export const deleteOneCocktailThunk = createAsyncThunk<void, string>(
+  'cocktail/deleteOneCocktailThunk',
+  async (cocktaildId) => {
+    await axiosApi.delete(`/cocktails/${cocktaildId}`);
+  },
+);

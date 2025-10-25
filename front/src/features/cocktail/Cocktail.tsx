@@ -8,6 +8,9 @@ import Rating from '@mui/material/Rating';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import { useState } from 'react';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import Button from '@mui/material/Button';
+import DeleteIcon from '@mui/icons-material/Delete';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -22,14 +25,14 @@ const style = {
 
 interface Props {
   cocktail: ICocktail;
+  showMyCocktail?: boolean;
 }
 
-const Cocktail: React.FC<Props> = ({ cocktail }) => {
+const Cocktail: React.FC<Props> = ({ cocktail, showMyCocktail }) => {
   const [modal, setModal] = useState<boolean>(false);
   const [value, setValue] = useState<number | null>(0);
   let image;
-  const ratingSum = cocktail.ratings.reduce((sum, item)=>sum + item.rating, 0) / cocktail.ratings.length
-
+  const ratingSum = cocktail.ratings.reduce((sum, item) => sum + item.rating, 0) / cocktail.ratings.length;
 
   if (cocktail.image) {
     image = apiUrl + '/' + cocktail.image;
@@ -44,13 +47,29 @@ const Cocktail: React.FC<Props> = ({ cocktail }) => {
     setModal(false);
   };
   return (
-    <Card sx={{ width: '20rem' }} onClick={() => openModal()}>
+    <Card sx={{ width: '20rem' }} onClick={() => openModal()} className="relative">
       <CardMedia sx={{ height: 140 }} image={image} title={cocktail.title} />
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
+        <Typography gutterBottom variant="h5" component="p" className="h-20">
           {cocktail.title}
         </Typography>
-        <Rating name="no-value" value={ratingSum} precision={0.5}/>
+        <Box component="div" className="flex">
+          {showMyCocktail && !cocktail.isPublished && (
+            <p className="p-1 bg-black w-fit capitalize text-white rounded-2xl absolute top-1 left-1">
+              reviewing..
+              <VisibilityIcon color="inherit" />
+            </p>
+          )}
+          {showMyCocktail && (
+            <Box component="div" className="absolute bottom-2 right-1">
+              <Button variant="outlined" color="error" startIcon={<DeleteIcon />}>
+                delete
+              </Button>
+            </Box>
+          )}
+        </Box>
+
+        <Rating name="no-value" value={ratingSum} precision={0.5} />
       </CardContent>
       <Modal
         open={modal}

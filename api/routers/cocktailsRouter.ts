@@ -7,9 +7,17 @@ import { Cocktail } from '../models/Cocktail';
 const cocktailsRouter = express.Router();
 
 cocktailsRouter.get('/', async (req, res, next) => {
+  const { filter } = req.query;
+
   try {
-    const cocktails = await Cocktail.find();
+    if (filter == 'all') {
+      const cocktails = await Cocktail.find({ isPublished: true });
+      res.status(200).send(cocktails);
+      return;
+    }
+    const cocktails = await Cocktail.find({ user: filter });
     res.status(200).send(cocktails);
+    return;
   } catch (e) {
     next(e);
   }
