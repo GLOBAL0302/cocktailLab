@@ -55,8 +55,33 @@ cocktailsRouter.patch('/cocktailId', auth, async (req, res, next) => {
   }
 });
 
-cocktailsRouter.delete('/cocktailId', auth, async (req, res, next) => {
+cocktailsRouter.delete('/:cocktailId', auth, async (req, res, next) => {
+  const user = (req as IReqWithUser).user;
+  const { cocktailId } = req.params;
   try {
+    const cocktails = await Cocktail.findOne({ _id: cocktailId });
+    if (!cocktails) {
+      res.status(400).send({ error: 'No cocktail with such Id' });
+      return;
+    }
+    if (!user) {
+      return;
+    }
+    const objectId = cocktails.user;
+    if (!objectId) {
+      res.status(400).send({ error: 'Cocktail has no associated user' });
+      return;
+    }
+    const userIdString = String(user._id);
+    const objectIdString = String(objectId);
+    const isOwner = userIdString === objectIdString;
+
+    if (!isOwner) {
+      res.status(403).send({ error: 'You are not authorized to delete this cocktail' });
+      return;
+    }
+    await Cocktail.findByIdAndDelete({ _id: cocktailId });
+    res.status(200).send({ message: 'Cocktail deleted successfully' });
   } catch (e) {
     if (e instanceof Error.ValidationError) {
       res.status(400).send(e);

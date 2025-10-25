@@ -7,10 +7,13 @@ import { apiUrl } from '../../Constants';
 import Rating from '@mui/material/Rating';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import { useState } from 'react';
+import { use, useState } from 'react';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { selectUser } from '../user/userSlice';
+import { deleteOneCocktailThunk, fetchCocktailsThunk } from './cocktailThunk';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -31,6 +34,9 @@ interface Props {
 const Cocktail: React.FC<Props> = ({ cocktail, showMyCocktail }) => {
   const [modal, setModal] = useState<boolean>(false);
   const [value, setValue] = useState<number | null>(0);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+
   let image;
   const ratingSum = cocktail.ratings.reduce((sum, item) => sum + item.rating, 0) / cocktail.ratings.length;
 
@@ -46,6 +52,13 @@ const Cocktail: React.FC<Props> = ({ cocktail, showMyCocktail }) => {
     e.stopPropagation();
     setModal(false);
   };
+
+  const deleteCocktail = async (e: React.ChangeEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    await dispatch(deleteOneCocktailThunk(cocktail._id));
+    if (user) await dispatch(fetchCocktailsThunk(user._id));
+  };
+
   return (
     <Card sx={{ width: '20rem' }} onClick={() => openModal()} className="relative">
       <CardMedia sx={{ height: 140 }} image={image} title={cocktail.title} />
@@ -60,15 +73,14 @@ const Cocktail: React.FC<Props> = ({ cocktail, showMyCocktail }) => {
               <VisibilityIcon color="inherit" />
             </p>
           )}
-          {showMyCocktail && (
+          {showMyCocktail && user && user._id === cocktail.user.toString() && (
             <Box component="div" className="absolute bottom-2 right-1">
-              <Button variant="outlined" color="error" startIcon={<DeleteIcon />}>
+              <Button onClick={deleteCocktail} variant="outlined" color="error" startIcon={<DeleteIcon />}>
                 delete
               </Button>
             </Box>
           )}
         </Box>
-
         <Rating name="no-value" value={ratingSum} precision={0.5} />
       </CardContent>
       <Modal

@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import { config } from './config';
 import usersRouter from './routers/usersRouter';
 import cocktailsRouter from './routers/cocktailsRouter';
+import adminRouter from './routers/admin';
 
 const app = express();
 const PORT = 8000;
@@ -11,6 +12,8 @@ const PORT = 8000;
 app.use(express.json());
 app.use(cors());
 app.use(express.static('public'));
+
+app.use('/admin', adminRouter);
 
 app.use('/users', usersRouter);
 app.use('/cocktails', cocktailsRouter);
